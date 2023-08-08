@@ -6,7 +6,17 @@
   pre-commit.hooks.markdownlint.enable = false;
   pre-commit.hooks.shellcheck.enable = true;
 
-  packages = [ pkgs.inotify-tools ];
+  enterShell = ''
+    export LANG="en_US.UTF-8"
+    export LC_ALL="en_US.UTF-8"
+  '';
+
+  packages = with pkgs; [ ]
+  ++ lib.optionals
+  pkgs.stdenv.isLinux (with
+  pkgs; [
+    inotify-tools
+  ]);
 
   processes = {
     gaius.exec = "mix phx.server";
@@ -18,7 +28,9 @@
     extensions = extensions: [
       extensions.postgis
     ];
-    initialScript = "CREATE USER postgres SUPERUSER; CREATE DATABASE postgres WITH OWNER postgres;";
+    initialScript = ''
+      CREATE USER postgres SUPERUSER; CREATE DATABASE postgres WITH OWNER postgres;
+    '';
   };
 }
 
